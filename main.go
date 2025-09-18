@@ -3,7 +3,6 @@ package main
 import (
 	"example/Go-Api/book"
 	"example/Go-Api/handler"
-	"fmt"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -20,33 +19,27 @@ func main() {
 	}
 	db.AutoMigrate(&book.BooksModel{})
 
-	books := book.BooksModel{}
-	books.ID = 4
-	books.Price = 20000
-	books.Rating = 5
-	books.Title = "dont afraid of the dark"
-	books.Description = "dont you afraid the dark in your area"
+	//=> FindALl()
+	// bookRepository := book.NewRepository(db)
+	// books, _ := bookRepository.FindAll()
+	// for _, v := range books {
+	// 	fmt.Println("Price :", v.Price)
+	// }
 
-	err = db.Create(&books).Error
+	// //=> FindById)
+	// res, _ := bookRepository.FindById(1)
+	// fmt.Println("Title :", res.Title)
 
-	if err != nil {
-		fmt.Println("=========================")
-		fmt.Println("error creating a new book")
-		fmt.Println("=========================")
-	}
+	//=> Create
+	// createNewBook := book.BooksModel{
+	// 	ID:          2,
+	// 	Title:       "you can to be heroes",
+	// 	Description: "this book for man",
+	// 	Rating:      10,
+	// }
 
-	var res []book.BooksModel
-	err = db.First(&res).Error
-
-	if err != nil {
-		fmt.Println("=========================")
-		fmt.Println("error put the first of book")
-		fmt.Println("=========================")
-	} else {
-		for _, b := range res {
-			fmt.Printf("Title :%s", b.Title)
-		}
-	}
+	// bookRepository.Create(createNewBook)
+	book.Repository.DeleteById(book.BooksModel{}, 2)
 
 	router := gin.Default()
 	router.GET("/", handler.GetRoot)

@@ -37,7 +37,7 @@ func QueryHandler(c *gin.Context) {
 }
 
 func AddBooksHandler(c *gin.Context) {
-	var addbook book.Books
+	var addbook book.BooksModel
 	err := c.ShouldBindJSON(&addbook)
 
 	if err != nil {
