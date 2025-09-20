@@ -20,34 +20,27 @@ func main() {
 	db.AutoMigrate(&book.BooksModel{})
 
 	//=> FindALl()
-	// bookRepository := book.NewRepository(db)
-	// books, _ := bookRepository.FindAll()
-	// for _, v := range books {
-	// 	fmt.Println("Price :", v.Price)
-	// }
+	bookRepository := book.NewRepository(db)
+	bookService := book.NewService(bookRepository)
+	bookHandler := handler.NewHandlerBook(bookService)
 
-	// //=> FindById)
-	// res, _ := bookRepository.FindById(1)
-	// fmt.Println("Title :", res.Title)
+	bookRequest := book.BookRequest{
+		Title: "A man who cant moved",
+		Price: "200",
+	}
 
-	//=> Create
-	// createNewBook := book.BooksModel{
-	// 	ID:          2,
-	// 	Title:       "you can to be heroes",
-	// 	Description: "this book for man",
-	// 	Rating:      10,
-	// }
-
-	// bookRepository.Create(createNewBook)
-	book.Repository.DeleteById(book.BooksModel{}, 2)
+	bookService.Create(bookRequest)
+	// bookRepository.DeleteById(2)
 
 	router := gin.Default()
-	router.GET("/", handler.GetRoot)
-	router.GET("/hello", handler.GetHello)
-	router.GET("/books/:id", handler.BooksHandler)
-	router.GET("/query", handler.QueryHandler)
+	v1 := router.Group("/v1")
 
-	router.POST("/books", handler.AddBooksHandler)
+	v1.GET("/", bookHandler.GetRoot)
+
+	v1.GET("/hello", bookHandler.GetHello)
+	v1.GET("/books/:id", bookHandler.BooksHandler)
+	v1.GET("/query", bookHandler.QueryHandler)
+	v1.POST("/books", bookHandler.AddBooksHandler)
 	router.Run()
 
 }

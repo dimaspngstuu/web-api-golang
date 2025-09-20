@@ -1,6 +1,8 @@
 package book
 
 import (
+	"fmt"
+
 	"gorm.io/gorm"
 )
 
@@ -8,7 +10,7 @@ type Repository interface {
 	FindAll() ([]BooksModel, error)
 	FindById(ID int) (BooksModel, error)
 	Create(book BooksModel) (BooksModel, error)
-	DeleteById(ID int, book BooksModel)
+	DeleteById(ID int) error
 }
 
 type repository struct {
@@ -36,8 +38,21 @@ func (r *repository) Create(book BooksModel) (BooksModel, error) {
 	return book, err
 }
 
-func (r *repository) DeleteById(ID int, book BooksModel) {
-	var books BooksModel
-	r.db.Where("ID = ?", ID).Delete(&books)
+func (r *repository) DeleteById(ID int) error {
+	var book BooksModel
+
+	err := r.db.First(&book, ID).Error
+	if err != nil {
+		fmt.Println("ID not found")
+		return err
+	}
+	// Hapus data jika ditemukan
+	if err := r.db.Delete(&book).Error; err != nil {
+		fmt.Println("Failed to delete book")
+		return err
+	}
+
+	// Jika berhasil
+	return nil
 
 }
