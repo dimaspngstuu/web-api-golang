@@ -25,7 +25,7 @@ func (h *bookHandler) GetBook(c *gin.Context) {
 
 	if id <= 0 || id != book.ID {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "ID Tidak Valid",
+			"message": "ID Not Valid",
 		})
 		return
 	}
