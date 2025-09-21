@@ -5,16 +5,11 @@ type Service interface {
 	FindById(ID int) (BooksModel, error)
 	Create(book BookRequest) (BooksModel, error)
 	Update(ID int, book BookRequest) (BooksModel, error)
-	DeleteById(ID int) error
+	Delete(ID int) (BooksModel, error)
 }
 
 type service struct {
 	repository Repository
-}
-
-// DeleteById implements Service.
-func (s *service) DeleteById(ID int) error {
-	panic("unimplemented")
 }
 
 func NewService(repository Repository) *service {
@@ -64,4 +59,11 @@ func (s *service) Update(ID int, bookRequest BookRequest) (BooksModel, error) {
 	UpdateBook, err := s.repository.Update(ID, book)
 
 	return UpdateBook, err
+}
+
+func (s *service) Delete(ID int) (BooksModel, error) {
+	book, err := s.repository.FindById(ID)
+	newBook, err := s.repository.Delete(book)
+
+	return newBook, err
 }

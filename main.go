@@ -24,20 +24,13 @@ func main() {
 	bookService := book.NewService(bookRepository)
 	bookHandler := handler.NewHandlerBook(bookService)
 
-	bookRequest := book.BookRequest{
-		Title: "A man who cant moved",
-		Price: "200",
-	}
-
-	bookService.Create(bookRequest)
-	// bookRepository.DeleteById(2)
-
 	router := gin.Default()
 	v1 := router.Group("/v1")
 
 	v1.GET("/books", bookHandler.GetListBooksHandler)
 	v1.GET("/books/:id", bookHandler.GetBook)
 	v1.POST("/books", bookHandler.AddBooksHandler)
+	v1.PUT("/books/:id", bookHandler.UpdateBooksHandler)
 	router.Run()
 
 }

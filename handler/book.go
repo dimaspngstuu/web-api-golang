@@ -95,3 +95,59 @@ func (h *bookHandler) AddBooksHandler(c *gin.Context) {
 	})
 
 }
+
+func (h *bookHandler) UpdateBooksHandler(c *gin.Context) {
+	var bookRequest book.BookRequest
+
+	err := c.ShouldBindJSON(&bookRequest)
+
+	if err != nil {
+		errorMessage := []string{}
+		for _, e := range err.(validator.ValidationErrors) {
+			errors := fmt.Sprintf("Error on field %s, then condition %s", e.Field(), e.ActualTag())
+			errorMessage = append(errorMessage, errors)
+
+		}
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": errorMessage,
+		})
+		return
+
+	}
+
+	IDString := c.Param("id")
+	ID, _ := strconv.Atoi(IDString)
+
+	book, err := h.bookService.Update(ID, bookRequest)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"data": book,
+	})
+
+}
+
+func (h *bookHandler) DeleteBooksHandler(c *gin.Context) {
+
+	IDString := c.Param("id")
+	ID, _ := strconv.Atoi(IDString)
+	book, err := h.bookService.Delete(int(ID))
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err,
+		})
+		return
+
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": book,
+	})
+
+}
