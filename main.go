@@ -19,7 +19,7 @@ func main() {
 	}
 	db.AutoMigrate(&book.BooksModel{})
 
-	//=> FindALl()
+	//=> Send to repository layer & service layer
 	bookRepository := book.NewRepository(db)
 	bookService := book.NewService(bookRepository)
 	bookHandler := handler.NewHandlerBook(bookService)
@@ -35,11 +35,8 @@ func main() {
 	router := gin.Default()
 	v1 := router.Group("/v1")
 
-	v1.GET("/", bookHandler.GetRoot)
-
-	v1.GET("/hello", bookHandler.GetHello)
-	v1.GET("/books/:id", bookHandler.BooksHandler)
-	v1.GET("/query", bookHandler.QueryHandler)
+	v1.GET("/books", bookHandler.GetListBooksHandler)
+	v1.GET("/books/:id", bookHandler.GetBook)
 	v1.POST("/books", bookHandler.AddBooksHandler)
 	router.Run()
 

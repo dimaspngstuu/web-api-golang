@@ -4,6 +4,7 @@ import (
 	"example/Go-Api/book"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
@@ -17,30 +18,49 @@ func NewHandlerBook(bookService book.Service) *bookHandler {
 	return &bookHandler{bookService}
 }
 
-func (h *bookHandler) GetRoot(c *gin.Context) {
+func (h *bookHandler) GetBook(c *gin.Context) {
+	StringId := c.Param("id")
+	id, _ := strconv.Atoi(StringId)
+	book, _ := h.bookService.FindById(id)
+
+	if id <= 0 || id != book.ID {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "ID Tidak Valid",
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"name": "dimas pangestu",
+		"data": book,
 	})
+
 }
 
-func (h *bookHandler) GetHello(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "hello world",
-	})
-}
+func (h *bookHandler) GetListBooksHandler(c *gin.Context) {
+	books, err := h.bookService.FindAll()
 
-func (h *bookHandler) BooksHandler(c *gin.Context) {
-	id := c.Param("id")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": err,
+		})
+		return
+	}
+
+	var booksResponse []book.BooksResponse
+
+	for _, b := range books {
+		BooksResponse := book.BooksResponse{
+			ID:          b.ID,
+			Title:       b.Title,
+			Description: b.Description,
+			Price:       b.Price,
+			Rating:      b.Rating,
+		}
+		booksResponse = append(booksResponse, BooksResponse)
+	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"id": id,
-	})
-}
-
-func (h *bookHandler) QueryHandler(c *gin.Context) {
-	query := c.Query("title")
-	c.JSON(http.StatusOK, gin.H{
-		"title": query,
+		"data": booksResponse,
 	})
 }
 

@@ -11,6 +11,7 @@ type Repository interface {
 	FindById(ID int) (BooksModel, error)
 	Create(book BooksModel) (BooksModel, error)
 	DeleteById(ID int) error
+	Update(ID int, book BooksModel) (BooksModel, error)
 }
 
 type repository struct {
@@ -55,4 +56,10 @@ func (r *repository) DeleteById(ID int) error {
 	// Jika berhasil
 	return nil
 
+}
+
+func (r *repository) Update(ID int, book BooksModel) (BooksModel, error) {
+
+	err := r.db.Save(&book).Error
+	return book, err
 }

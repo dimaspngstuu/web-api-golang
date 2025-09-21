@@ -3,7 +3,8 @@ package book
 type Service interface {
 	FindAll() ([]BooksModel, error)
 	FindById(ID int) (BooksModel, error)
-	Create(bookRequest BookRequest) (BooksModel, error)
+	Create(book BookRequest) (BooksModel, error)
+	Update(ID int, book BookRequest) (BooksModel, error)
 	DeleteById(ID int) error
 }
 
@@ -32,12 +33,35 @@ func (s *service) FindById(ID int) (BooksModel, error) {
 
 func (s *service) Create(bookRequest BookRequest) (BooksModel, error) {
 	price, _ := bookRequest.Price.Int64()
-	book := BooksModel{
-		Title: bookRequest.Title,
-		Price: int(price),
+	rating, _ := bookRequest.Rating.Int64()
+
+	books := BooksModel{
+		Title:       bookRequest.Title,
+		Price:       int(price),
+		Description: bookRequest.Description,
+		Rating:      int(rating),
 	}
 
-	newBook, err := s.repository.Create(book)
+	newBook, err := s.repository.Create(books)
 
 	return newBook, err
+}
+
+func (s *service) Update(ID int, bookRequest BookRequest) (BooksModel, error) {
+	book, err := s.repository.FindById(ID)
+
+	if err != nil {
+		return BooksModel{}, err
+	}
+	price, _ := bookRequest.Price.Int64()
+	rating, _ := bookRequest.Rating.Int64()
+
+	book.Title = bookRequest.Title
+	book.Price = int(price)
+	book.Rating = int(rating)
+	book.Description = bookRequest.Description
+
+	UpdateBook, err := s.repository.Update(ID, book)
+
+	return UpdateBook, err
 }
